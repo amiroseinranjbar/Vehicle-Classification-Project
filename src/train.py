@@ -1,0 +1,117 @@
+import random
+import numpy as np
+import torch
+import torch.nn as nn
+
+
+def set_seed(seed):
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
+def train_model(
+    model,
+    train_loader,
+    val_loader,
+    optimizer,
+    epochs=150,
+    patience=20,
+    criterion=None
+):
+
+    device = torch.device(
+        "cuda" if torch.cuda.is_available()
+        else "cpu"
+    )
+
+    model = model.to(device)
+
+    if criterion is None:
+        criterion = nn.CrossEntropyLoss()
+
+    best_val_accuracy = 0.0
+    best_model_state = None
+    patience_counter = 0
+
+    for epoch in range(epochs):
+
+        model.train()
+
+        for images, labels in train_loader:
+
+            images = images.to(device)
+            labels = labels.to(device)
+
+            optimizer.zero_grad()
+
+            outputs = model(images)
+
+            loss = criterion(
+                outputs,
+                labels
+            )
+
+            loss.backward()
+
+            optimizer.step()
+
+        model.eval()
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+
+            for images, labels in val_loader:
+
+                images = images.to(device)
+                labels = labels.to(device)
+
+                outputs = model(images)
+
+                _, predicted = torch.max(
+                    outputs,
+                    1
+                )
+
+                total += labels.size(0)
+
+                correct += (
+                    predicted == labels
+                ).sum().item()
+
+        val_accuracy = correct / total
+
+        print(
+            f"Epoch [{epoch + 1}/{epochs}], "
+            f"Val Accuracy: "
+            f"{val_accuracy * 100:.2f}%"
+        )
+
+        if val_accuracy > best_val_accuracy:
+
+            best_val_accuracy = val_accuracy
+
+            best_model_state = {
+                key: value.detach().cpu().clone()
+                for key, value in model.state_dict().items()
+            }
+
+            patience_counter = 0
+
+        else:
+
+            patience_counter += 1
+
+        if patience_counter >= patience:
+
+            print("Early stopping.")
+
+            break
+
+    return best_val_accuracy, best_model_state
