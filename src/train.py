@@ -23,7 +23,6 @@ def train_model(
     patience=20,
     criterion=None
 ):
-
     device = torch.device(
         "cuda" if torch.cuda.is_available()
         else "cpu"
@@ -35,12 +34,18 @@ def train_model(
         criterion = nn.CrossEntropyLoss()
 
     best_val_accuracy = 0.0
+    best_train_loss = 0.0
+    best_train_accuracy = 0.0
     best_model_state = None
     patience_counter = 0
 
     for epoch in range(epochs):
 
         model.train()
+
+        running_loss = 0.0
+        train_correct = 0
+        train_total = 0
 
         for images, labels in train_loader:
 
@@ -51,14 +56,21 @@ def train_model(
 
             outputs = model(images)
 
-            loss = criterion(
-                outputs,
-                labels
-            )
+            loss = criterion(outputs, labels)
 
             loss.backward()
 
             optimizer.step()
+
+            running_loss += loss.item() * labels.size(0)
+
+            _, predicted = torch.max(outputs, 1)
+
+            train_total += labels.size(0)
+            train_correct += (predicted == labels).sum().item()
+
+        train_loss = running_loss / train_total
+        train_accuracy = train_correct / train_total
 
         model.eval()
 
@@ -74,28 +86,25 @@ def train_model(
 
                 outputs = model(images)
 
-                _, predicted = torch.max(
-                    outputs,
-                    1
-                )
+                _, predicted = torch.max(outputs, 1)
 
                 total += labels.size(0)
-
-                correct += (
-                    predicted == labels
-                ).sum().item()
+                correct += (predicted == labels).sum().item()
 
         val_accuracy = correct / total
 
         print(
             f"Epoch [{epoch + 1}/{epochs}], "
-            f"Val Accuracy: "
-            f"{val_accuracy * 100:.2f}%"
+            f"Train Loss: {train_loss:.4f}, "
+            f"Train Accuracy: {train_accuracy * 100:.2f}%, "
+            f"Val Accuracy: {val_accuracy * 100:.2f}%"
         )
 
         if val_accuracy > best_val_accuracy:
 
             best_val_accuracy = val_accuracy
+            best_train_loss = train_loss
+            best_train_accuracy = train_accuracy
 
             best_model_state = {
                 key: value.detach().cpu().clone()
@@ -111,7 +120,11 @@ def train_model(
         if patience_counter >= patience:
 
             print("Early stopping.")
-
             break
 
-    return best_val_accuracy, best_model_state
+    return (
+        best_val_accuracy,
+        best_train_loss,
+        best_train_accuracy,
+        best_model_state
+    )
