@@ -1,0 +1,25 @@
+model,augmentation,seed,best_val_accuracy,augmentation_count
+ResNet18 Full,No Augmentation,42,96.77819083023545,0
+ResNet18 Full,No Augmentation,10,96.90210656753408,0
+ResNet18 Full,No Augmentation,20,97.14993804213134,0
+ResNet18 Full,Basic,42,96.90210656753408,2
+ResNet18 Full,Basic,10,96.90210656753408,2
+ResNet18 Full,Basic,20,97.64560099132589,2
+ResNet18 Full,Color,42,97.27385377942998,1
+ResNet18 Full,Color,10,97.14993804213134,1
+ResNet18 Full,Color,20,97.14993804213134,1
+ResNet18 Full,Crop,42,97.52168525402726,1
+ResNet18 Full,Crop,10,97.14993804213134,1
+ResNet18 Full,Crop,20,97.27385377942998,1
+ResNet18 Full,Full without Color,42,97.76951672862454,3
+ResNet18 Full,Full without Color,10,97.39776951672863,3
+ResNet18 Full,Full without Color,20,97.76951672862454,3
+ResNet18 Full,Full + Basic,42,96.90210656753408,5
+ResNet18 Full,Full + Basic,10,96.77819083023545,5
+ResNet18 Full,Full + Basic,20,97.64560099132589,5
+ResNet18 Full,Full + Basic + Color,42,97.02602230483272,6
+ResNet18 Full,Full + Basic + Color,10,97.39776951672863,6
+ResNet18 Full,Full + Basic + Color,20,97.39776951672863,6
+ResNet18 Full,Full,42,97.52168525402726,4
+ResNet18 Full,Full,10,97.89343246592317,4
+ResNet18 Full,Full,20,97.39776951672863,4
