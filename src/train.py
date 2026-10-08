@@ -408,3 +408,65 @@ def train_model_weight_scheduler(
         best_model_state,
         history
     )
+
+def validate_model(
+    model,
+    data_loader,
+    criterion=None
+):
+    device = torch.device(
+        "cuda" if torch.cuda.is_available()
+        else "cpu"
+    )
+
+    model = model.to(device)
+
+    if criterion is None:
+        criterion = nn.CrossEntropyLoss()
+
+    model.eval()
+
+    running_loss = 0.0
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+
+        for images, labels in data_loader:
+
+            images = images.to(device)
+            labels = labels.to(device)
+
+            outputs = model(images)
+
+            loss = criterion(
+                outputs,
+                labels
+            )
+
+            running_loss += (
+                loss.item()
+                * labels.size(0)
+            )
+
+            _, predicted = torch.max(
+                outputs,
+                1
+            )
+
+            total += labels.size(0)
+
+            correct += (
+                predicted == labels
+            ).sum().item()
+
+    loss = running_loss / total
+
+    accuracy = correct / total
+
+    print(
+        f"Loss: {loss:.4f}, "
+        f"Accuracy: {accuracy * 100:.2f}%"
+    )
+
+    return loss, accuracy
