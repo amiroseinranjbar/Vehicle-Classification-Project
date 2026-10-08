@@ -1,4 +1,4 @@
-# Vehicle-Classification-Project
+
 # 🚗 Traffic Vehicle Classification
 
 A deep learning project for **traffic vehicle image classification** using **PyTorch**.
