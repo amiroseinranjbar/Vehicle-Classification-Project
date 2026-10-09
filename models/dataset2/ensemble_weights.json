@@ -1,0 +1,7 @@
+{
+    "resnet18_d2_full_1.pth": 0.2003668042182485,
+    "resnet18_d2_full_2.pth": 0.20105456212746448,
+    "resnet18_d2_full_best.pth": 0.20059605685465384,
+    "resnet18_d2_layer4_best.pth": 0.19830353049060065,
+    "resnet18_d2_fullnormalized.pth": 0.19967904630903258
+}
